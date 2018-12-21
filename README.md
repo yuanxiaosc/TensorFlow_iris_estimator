@@ -1,6 +1,82 @@
-# TensorFlow_iris_estimator
+## TensorFlow_iris_estimator
 The main purpose of this resource is to **show how to use tfrecord data** and **customize TensorFlow estimator**. 
+
 Of course, you can modify the code as much as you want. You can also go to [my blog](https://yuanxiaosc.github.io/).
+
+## tfrecord basic explanation
+
+> For example, see the [code](https://github.com/yuanxiaosc/TensorFlow_iris_estimator)
+
+### Producte tfrecord files
+
+#### 1. Open TFRecordWriter
+```
+writer = tf.python_io.TFRecordWriter(tfrecord_store_path)
+```
+#### 2. prepater to feature_dict
+```
+for index, row in pandas_datafram_data.iterrows():
+    dict_row = dict(row)
+    feature_dict = {}
+    # prepater to feature_dict
+    for k,v in dict_row.items():
+        if k in ['feature1', 'feature2',...,'featureN']:
+            feature_dict[k] = tf.train.Feature(float_list=tf.train.FloatList(value=[v]))
+        elif k in ['feature1', 'feature2',...,'featureN']:
+            feature_dict[k] = tf.train.Feature(int64_list=tf.train.Int64List(value=[v])
+        else:
+            feature_dict[k] = tf.train.Feature(int64_list=tf.train.BytesList(value=[v)])
+```
+#### 3. producte data example
+```
+    example = tf.train.Example(features=tf.train.Features(feature=feature_dict))
+```
+#### 4. serialize to string
+```
+    serialized = example.SerializeToString()
+```
+#### 5. write a example to tfrecord file
+```
+    writer.write(serialized)
+```
+#### 6. Close TFRecordWriter
+```
+writer.close()
+```
+
+### Using tfrecord files
+
+#### 1. Open TFRecordDataset
+```
+filenames = ['tfrecord_file_name1','tfrecord_file_name2']
+tf_dataset = tf.data.TFRecordDataset(filenames)
+```
+#### 2. Parse dataset
+```
+def _parse_function(record):
+    features = {"feature1": tf.FixedLenFeature((), tf.float32, default_value=0.0),
+                "feature2": tf.FixedLenFeature((), tf.int64, default_value=0)}
+    parsed_features = tf.parse_single_example(record, features)
+    return {"feature1": parsed_features["feature1"]}, parsed_features["Species"]
+dataset = tf_dataset.map(_parse_function)
+```
+#### 3. Shuffle, repeat, and batch the examples
+```
+tf_dataset = dataset.shuffle(1000).repeat().batch(batch_size)
+```
+#### 4. Iterate dataset
+```
+tf_iterator = tf_dataset.make_one_shot_iterator()
+next_element = tf_iterator.get_next()
+with tf.Session() as sess:
+    for i in range(show_numbers):
+        a_data = sess.run(next_element)
+        print(a_data)  
+```
+
+-----
+
+## About the repo
 
 ### Rely on
 + python 3.6
@@ -91,4 +167,5 @@ Prediction is "Virginica" (98.1%), expected "Virginica"
 
 ### Main References
 [iris_data.py](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py)
+
 [custom_estimator.py](https://github.com/tensorflow/models/blob/master/samples/core/get_started/custom_estimator.py)
