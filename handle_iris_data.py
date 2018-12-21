@@ -176,6 +176,52 @@ def csv_input_fn(csv_path, batch_size,is_traing=True):
     # Return the dataset.
     return dataset
 
+def show_memory_dataset(show_numbers=3,batch_size=100):
+    """iterate dataset and show data content and type """
+    (train_x, train_y), (test_x, test_y) = load_data()
+    dataset = train_input_fn(train_x, train_y, batch_size=batch_size)
+    iterator = dataset.make_one_shot_iterator()
+    next_element = iterator.get_next()
+    with tf.Session() as sess:
+        for i in range(show_numbers):
+            a_data = sess.run(next_element)
+            print(a_data)
+            print('^'*50)
+    print("array type:\t",a_data[0]['SepalLength'].dtype)
+    return a_data
+
+def show_csv_dataset(show_numbers=3,batch_size=100):
+    """iterate dataset and show data content and type """
+    train_path, test_path = maybe_download()
+    csv_dataset = csv_input_fn(train_path, batch_size=batch_size)
+    csv_iterator = csv_dataset.make_one_shot_iterator()
+    next_element = csv_iterator.get_next()
+    with tf.Session() as sess:
+        for i in range(show_numbers):
+            a_data = sess.run(next_element)
+            print(a_data)
+            print('^'*50)
+    return a_data
+
+def show_tfrecord_dataset(show_numbers=3,batch_size=100):
+    """iterate dataset and show data content and type """
+    if not os.path.exists("data/iris_training.tfrecord"):
+        store_tfrecord_file()
+    tf_dataset = train_input_fn_by_tfrecord(
+        tfrecord_file="data/iris_training.tfrecord", batch_size=batch_size)
+    tf_iterator = tf_dataset.make_one_shot_iterator()
+    next_element = tf_iterator.get_next()
+    with tf.Session() as sess:
+        for i in range(show_numbers):
+            a_data = sess.run(next_element)
+            print(a_data)
+            print('^'*50)
+    return a_data
 
 if __name__=="__main__":
-    train_path, test_path = maybe_download()
+    print("show_memory_dataset:\n")
+    show_memory_dataset(show_numbers=3,batch_size=5)
+    print("show_csv_dataset:\n")
+    show_csv_dataset(show_numbers=3,batch_size=5)
+    print("show_tfrecord_dataset:\n")
+    show_tfrecord_dataset(show_numbers=3,batch_size=5)
