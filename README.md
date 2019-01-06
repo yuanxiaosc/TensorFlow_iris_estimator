@@ -5,7 +5,11 @@ Of course, you can modify the code as much as you want. You can also go to [my b
 
 ## tfrecord basic explanation
 
-> For example, see the [code](https://github.com/yuanxiaosc/TensorFlow_iris_estimator)
+> For example, see the [code](https://github.com/yuanxiaosc/TensorFlow_iris_tfrecord_and_estimator)
+
+## tensorflow official sample code
+[blog_estimators_dataset.py](https://github.com/tensorflow/models/blob/master/samples/outreach/blogs/blog_estimators_dataset.py)
+> code explain[Creating Custom Estimators in TensorFlow(https://developers.googleblog.com/2017/12/creating-custom-estimators-in-tensorflow.html)
 
 ### Producte tfrecord files
 
